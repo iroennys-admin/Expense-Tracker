@@ -8,8 +8,6 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,html,css,txt,json,otf,ttf,md
 
 version = 1.0.0
-version.regex = __version__ = ['\"](.*)['\"]
-version.filename = %(source.dir)s/main.py
 
 requirements = python3, django, sqlite3, setuptools
 

@@ -15,8 +15,6 @@ presplash.color = #1a1a2e
 
 orientation = portrait
 
-osx.package_name = Expense Tracker
-
 android.minapi = 21
 android.api = 34
 android.ndk = 25b
@@ -32,33 +30,9 @@ android.accept_sdk_license = True
 
 android.gradle_dependencies = 'androidx.webkit:webkit:1.12.1'
 
-android.add_src =
-
-android.add_aars =
-
-android.add_jars =
-
-android.private_storage_path =
-
 android.allow_backup = True
 
-android.keystore =
-
-android.keystore.password =
-
-android.keyalias =
-
-android.keyalias.password =
-
-android.manifest.extra = <uses-feature android:glEsVersion="0x00020000" android:required="True" />
-
-android.strings =
-
-android.appclass =
-
 android.use_shlib = True
-
-android.copy_libs =
 
 [buildozer]
 

@@ -1,0 +1,102 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-32bit:
+    runs-on: ubuntu-latest
+    container:
+      image: kivy/buildozer:latest
+    outputs:
+      apk_name: ${{ steps.set-name.outputs.apk_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set architecture to 32-bit
+        run: sed -i 's/android.archs = .*/android.archs = armeabi-v7a/' buildozer.spec
+
+      - name: Build APK
+        run: |
+          mkdir -p /home/user/.buildozer
+          buildozer android debug
+
+      - name: Set APK name
+        id: set-name
+        run: echo "apk_name=ExpenseTracker-32bit-$(date +%Y%m%d).apk" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk-32bit
+          path: bin/*.apk
+
+  build-64bit:
+    runs-on: ubuntu-latest
+    container:
+      image: kivy/buildozer:latest
+    outputs:
+      apk_name: ${{ steps.set-name.outputs.apk_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set architecture to 64-bit
+        run: sed -i 's/android.archs = .*/android.archs = arm64-v8a/' buildozer.spec
+
+      - name: Build APK
+        run: |
+          mkdir -p /home/user/.buildozer
+          buildozer android debug
+
+      - name: Set APK name
+        id: set-name
+        run: echo "apk_name=ExpenseTracker-64bit-$(date +%Y%m%d).apk" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk-64bit
+          path: bin/*.apk
+
+  release:
+    needs: [build-32bit, build-64bit]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: apk-32bit
+          path: apks/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: apk-64bit
+          path: apks/
+
+      - name: Rename APKs
+        run: |
+          mv apks/*.apk apks/ExpenseTracker-armeabi-v7a-32bit.apk 2>/dev/null || true
+          mv apks/*.apk apks/ExpenseTracker-arm64-v8a-64bit.apk 2>/dev/null || true
+          ls -la apks/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Expense Tracker ${{ github.ref_name }}
+          body: |
+            APK listo para instalar en dispositivos Android.
+
+            ## Archivos
+            - **ExpenseTracker-armeabi-v7a-32bit.apk** — Para dispositivos de 32 bits (ARMv7)
+            - **ExpenseTracker-arm64-v8a-64bit.apk** — Para dispositivos de 64 bits (ARM64)
+
+            ## Cómo instalar
+            1. Descarga el APK correspondiente a tu dispositivo
+            2. Habilita "Instalar apps de orígenes desconocidos" en Ajustes
+            3. Abre el archivo APK e instala
+          files: apks/*

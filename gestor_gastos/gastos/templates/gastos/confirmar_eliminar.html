@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+
+{% block title %}Eliminar gasto &middot; Gestor de Gastos{% endblock %}
+{% block header %}Eliminar gasto{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:500px;margin:0 auto;">
+    <div class="confirm-box">
+        <p>¿Estás seguro de que deseas eliminar este gasto?</p>
+        <p class="gasto-info">
+            {% if gasto.descripcion %}{{ gasto.descripcion }} &mdash; {% endif %}
+            ${{ gasto.monto|floatformat:2 }} &mdash; {{ gasto.categoria }}
+            &mdash; {{ gasto.fecha|date:"d/m/Y" }}
+        </p>
+        <form method="POST" class="confirm-actions">
+            {% csrf_token %}
+            <button type="submit" class="btn-delete" style="padding:10px 28px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Sí, eliminar</button>
+            <a href="{% url 'home' %}" class="btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

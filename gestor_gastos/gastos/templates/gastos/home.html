@@ -1,51 +1,103 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Gestor de gastos</title>
-    </head>
-    
-    <style>
-        .gastos{
-            display: grid;
-            grid-template-columns: 2fr 3fr;
-        }
-    </style>    
-        <body>
-        <div class="gastos">
+{% extends 'main.html' %}
 
-            <div>
-            <h1>Gestor de gastos</h1>
-            <p>total: {{total}}</p>
-            <a href="{% url 'agregar' %}">Agregar gasto</a>
-            <br>
-    
-            <br>
-            
-            </div>
-            <div>
-            {% for gasto in gastos %}
-            <hr>
-            <p>monto: {{gasto.monto}}</p>
-            <p>categoria: {{gasto.categoria}}</p>
-            <p>fecha: {{gasto.fecha}}</p>
-            <a href="{% url 'eliminar' gasto.id %}">Eliminar</a>
-            <a href="{% url 'editar' gasto.id %}">Editar</a>
-            <hr>
-            {% endfor %}
-            </div>
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
+{% block content %}
+<div class="card">
+    <h2>Resumen</h2>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <div class="label">Total gastado</div>
+            <div class="value positive">${{ total_general|floatformat:2 }}</div>
         </div>
+        <div class="summary-item">
+            <div class="label">Total de gastos</div>
+            <div class="value">{{ gastos|length }}</div>
+        </div>
+        {% for cat in totales_por_categoria|slice:":3" %}
+        <div class="summary-item">
+            <div class="label">{{ cat.categoria }}</div>
+            <div class="value positive">${{ cat.total|floatformat:2 }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
+<div class="card">
+    <h2>Todos los gastos</h2>
 
-        
+    <form method="GET" class="filter-bar">
+        <label for="categoria">Filtrar por categoría:</label>
+        <select name="categoria" id="categoria">
+            <option value="">Todas las categorías</option>
+            {% for cat in categorias %}
+            <option value="{{ cat }}" {% if categoria_filtro == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filtrar</button>
+        {% if categoria_filtro %}
+        <a href="{% url 'home' %}" class="btn-clear" style="padding:8px 20px;background:#6c757d;color:white;border-radius:8px;text-decoration:none;font-size:0.9rem;">Limpiar filtro</a>
+        {% endif %}
+    </form>
 
+    {% if gastos %}
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th>Monto</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for gasto in gastos %}
+            <tr>
+                <td>{{ gasto.fecha|date:"d/m/Y" }}</td>
+                <td><span class="badge badge-cat">{{ gasto.categoria }}</span></td>
+                <td>{{ gasto.descripcion|default:"—" }}</td>
+                <td><strong>${{ gasto.monto|floatformat:2 }}</strong></td>
+                <td class="actions">
+                    <a href="{% url 'editar' gasto.id %}" class="btn-edit">Editar</a>
+                    <a href="{% url 'eliminar' gasto.id %}" class="btn-delete">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="3"><strong>Total</strong></td>
+                <td><strong>${{ total_general|floatformat:2 }}</strong></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty">
+        <p>No hay gastos registrados</p>
+        <p style="margin-top:8px;font-size:0.9rem;">
+            <a href="{% url 'agregar' %}" style="color:#4cc9f0;text-decoration:none;">Agrega tu primer gasto</a>
+        </p>
+    </div>
+    {% endif %}
+</div>
 
-
-
-
-
-
-    </body>
-</html>
+{% if totales_por_categoria|length > 3 %}
+<div class="card">
+    <h2>Gastos por categoría</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Categoría</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cat in totales_por_categoria %}
+            <tr>
+                <td><span class="badge badge-cat">{{ cat.categoria }}</span></td>
+                <td><strong>${{ cat.total|floatformat:2 }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -28,7 +28,7 @@ android.wakelock = True
 
 android.accept_sdk_license = True
 
-android.gradle_dependencies = 'androidx.webkit:webkit:1.12.1'
+android.gradle_dependencies = androidx.webkit:webkit:1.12.1
 
 android.allow_backup = True
 

@@ -9,7 +9,7 @@ source.include_exts = py,png,jpg,kv,atlas,html,css,txt,json,otf,ttf,md
 
 version = 1.0.0
 
-requirements = python3, django, sqlite3, setuptools
+requirements = python3, django, sqlite3, setuptools, pyjnius
 
 presplash.color = #1a1a2e
 

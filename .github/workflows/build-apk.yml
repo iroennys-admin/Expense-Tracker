@@ -70,17 +70,17 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: apk-32bit
-          path: apks/
+          path: apks/32bit/
 
       - uses: actions/download-artifact@v4
         with:
           name: apk-64bit
-          path: apks/
+          path: apks/64bit/
 
       - name: Rename APKs
         run: |
-          mv apks/*.apk apks/ExpenseTracker-armeabi-v7a-32bit.apk 2>/dev/null || true
-          mv apks/*.apk apks/ExpenseTracker-arm64-v8a-64bit.apk 2>/dev/null || true
+          mv apks/32bit/*.apk apks/ExpenseTracker-armeabi-v7a-32bit.apk
+          mv apks/64bit/*.apk apks/ExpenseTracker-arm64-v8a-64bit.apk
           ls -la apks/
 
       - name: Create Release
